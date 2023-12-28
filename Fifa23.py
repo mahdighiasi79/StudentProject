@@ -1,5 +1,4 @@
 import copy
-
 import pandas as pd
 import numpy as np
 import pickle
@@ -59,6 +58,34 @@ def pca(input_matrix):
     return result.transpose()
 
 
+def k_means(points, k, iterations):
+    n, d = points.shape
+    centers = np.random.random((k, d))
+
+    for c in range(iterations):
+        members = [[]] * k
+        for i in range(n):
+            nearest_center = -1
+            nearest_distance = np.inf
+            for j in range(k):
+                distance = np.linalg.norm(points[i] - centers[j])
+                if distance < nearest_distance:
+                    nearest_center = j
+                    nearest_distance = distance
+            members[nearest_center].append(i)
+        members = np.array(members)
+
+        for i in range(k):
+            cluster = members[i]
+            new_center = np.zeros(d)
+            for element in cluster:
+                new_center += element
+            new_center /= len(cluster)
+            centers[i] = new_center
+
+    return centers
+
+
 if __name__ == "__main__":
     #extract_numerical_values()
 
@@ -67,4 +94,5 @@ if __name__ == "__main__":
         f.close()
     best_players = np.array(nv[:91])
 
-    print(pca(best_players).shape)
+    a = [[]] * 3
+    print(a)
