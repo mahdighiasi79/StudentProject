@@ -1,3 +1,5 @@
+import copy
+
 import pandas as pd
 import numpy as np
 import pickle
@@ -24,14 +26,45 @@ def extract_numerical_values():
         pickle.dump(numerical_values, file)
 
 
+def covariance_matrix(input_matrix):
+    n = len(input_matrix)
+    d = len(input_matrix[0])
+    sigmoid_matrix = np.zeros((d, d))
+    for i in range(n):
+        x_i = np.reshape(copy.deepcopy(input_matrix[i]), (d, 1))
+        x_i_t = np.reshape(copy.deepcopy(input_matrix[i]), (1, d))
+        sigmoid_matrix += x_i @ x_i_t
+    sigmoid_matrix /= n
+    return sigmoid_matrix
+
+
+def pca(input_matrix):
+    sigmoid_matrix = covariance_matrix(input_matrix)
+    eigenvalues, eigenvectors = np.linalg.eig(sigmoid_matrix)
+    sorted_eigenvalues = sorted(eigenvalues, reverse=True)
+
+    new_basis = []
+    for i in range(len(eigenvalues)):
+        if eigenvalues[i] == sorted_eigenvalues[0]:
+            new_basis.append(eigenvectors[i])
+            break
+    for i in range(len(eigenvalues)):
+        if eigenvalues[i] == sorted_eigenvalues[1]:
+            new_basis.append(eigenvectors[i])
+            break
+    new_basis = np.array(new_basis)
+
+    result = copy.deepcopy(input_matrix)
+    result = new_basis @ result.transpose()
+    return result.transpose()
+
+
 if __name__ == "__main__":
     #extract_numerical_values()
 
     with open("numerical values.bin", "rb") as f:
         nv = pickle.load(f)
         f.close()
+    best_players = np.array(nv[:91])
 
-    print(nv[:2])
-
-    print("hello")
-
+    print(pca(best_players).shape)
