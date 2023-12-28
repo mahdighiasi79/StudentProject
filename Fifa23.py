@@ -86,6 +86,20 @@ def k_means(points, k, iterations):
     return centers
 
 
+def clustering(points, centers):
+    clusterings = []
+    for i in range(len(points)):
+        nearest_center = -1
+        nearest_distance = np.inf
+        for j in range(len(centers)):
+            distance = np.linalg.norm(points[i] - centers[j])
+            if distance < nearest_distance:
+                nearest_distance = distance
+                nearest_center = j
+        clusterings[i] = nearest_center
+    return clusterings
+
+
 if __name__ == "__main__":
     #extract_numerical_values()
 
